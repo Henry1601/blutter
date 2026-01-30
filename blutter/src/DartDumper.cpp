@@ -216,7 +216,7 @@ std::vector<std::pair<intptr_t, std::string>> DartDumper::DumpStructHeaderFile(s
 						name = std::format("UnlinkedCall_{:#x}_{:#x}", offset, dartFn->Address());
 					}
 					else {
-						name = std::format("UnlinkedCall_{:#x}_[imm:{:#x}](no function)", offset, imm);
+						name = std::format("UnlinkedCall_{:#x}_imm_{:#x}", offset, imm);
 					}
 				}
 				else {
