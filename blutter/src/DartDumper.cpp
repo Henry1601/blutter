@@ -211,7 +211,13 @@ std::vector<std::pair<intptr_t, std::string>> DartDumper::DumpStructHeaderFile(s
 				if (unlinkTargetType == dart::ObjectPool::EntryType::kImmediate) {
 					const auto imm = pool.RawValueAt(i + 1);
 					auto dartFn = app.GetFunction(imm - app.base());
-					name = std::format("UnlinkedCall_{:#x}_{:#x}", offset, dartFn->Address(), offset);
+					// if the Dart function does not exist, set name to (no function)
+					if (dartFn) {
+						name = std::format("UnlinkedCall_{:#x}_{:#x}", offset, dartFn->Address());
+					}
+					else {
+						name = std::format("UnlinkedCall_{:#x}_[imm:{:#x}](no function)", offset, imm);
+					}
 				}
 				else {
 					ASSERT(unlinkTargetType == dart::ObjectPool::EntryType::kTaggedObject);
@@ -822,7 +828,11 @@ std::string DartDumper::getPoolObjectDescription(intptr_t offset, bool simpleFor
 			if (unlinkTargetType == dart::ObjectPool::EntryType::kImmediate) {
 				const auto imm = pool.RawValueAt(idx + 1);
 				auto dartFn = app.GetFunction(imm - app.base());
-				return std::format("[pp+{:#x}] UnlinkedCall: {:#x} - {}", offset, dartFn->Address(), dartFn->FullName().c_str());
+				// if the Dart function does not exist, set name to (no function)
+				if (dartFn) {
+					return std::format("[pp+{:#x}] UnlinkedCall: {:#x} - {}", offset, dartFn->Address(), dartFn->FullName().c_str());
+				}
+				return std::format("[pp+{:#x}] UnlinkedCall: [imm:{:#x}] (no function)", offset, imm);
 			}
 			else {
 				ASSERT(unlinkTargetType == dart::ObjectPool::EntryType::kTaggedObject);
